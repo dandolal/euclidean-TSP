@@ -78,23 +78,23 @@ class Graph {
   }
 
   void add_perfect_matching() {
-    auto odds = find_odds();
-    set<Edge> odd_edges;
+     auto odds = find_odds();
+    Graph G(odds.size());
+    vector<double> cost;
     for (int i = 0; i < odds.size(); ++i) {
       for (int j = i + 1; j < odds.size(); ++j) {
+        G.AddEdge(i, j);
         int a = odds[i], b = odds[j];
-        odd_edges.insert({a, b, distance(points_[a], points_[b])});
+        cost.push_back(distance(points_[a], points_[b]));
       }
     }
-    set<int> used;
-    while(!odd_edges.empty()) {
-      auto cur = *odd_edges.begin();
-      odd_edges.erase(cur);
-      if (used.count(cur.a) == 0 && used.count(cur.b) == 0) {
-        MST.insert({cur.a , cur.b, distance(points_[cur.a], points_[cur.b])});
-        used.insert(cur.a);
-        used.insert(cur.b);
-      }
+    Matching M(G);
+    auto p = M.SolveMinimumCostPerfectMatching(cost);
+    for (int i: p.first) {
+      auto edge = G.GetEdge(i);
+      int a = odds[edge.first];
+      int b = odds[edge.second];
+      MST.insert({a , b, distance(points_[a], points_[b])});
     }
   }
 
